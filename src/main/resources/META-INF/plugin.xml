@@ -1,0 +1,51 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>tech.qiya.ImportAll</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>ImportAll</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    Enter short description for your plugin here.<br>
+    <em>most HTML tags may be used</em>
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <projectConfigurable groupId="tools" displayName="My Test Config" id="dsyconfig.id"
+                             instance="tech.qiya.importall.factory.SettingFactory"/>
+        <toolWindow id="Read-Book" secondary="false" anchor="right" icon="/icons/logo.png"
+                    factoryClass="tech.qiya.importall.factory.ReadFactory"/>
+        <!-- 在Setting中添加自定义配置模版 -->
+<!--        <projectConfigurable groupId="Other Settings" displayName="My Config" id="thief.id"-->
+<!--                             instance="MySearchableConfigurable"/>-->
+    </extensions>
+    <actions>
+        <action id="tech.qiya.importall.PopupDialogAction" class="tech.qiya.importall.PopupDialogAction"
+                text="Pop Dialog Action" description="SDK action example">
+            <override-text place="MainMenu" text="Popup Dialog Action"/>
+            <keyboard-shortcut
+                    keymap="$default"
+                    first-keystroke="control alt A"
+                    second-keystroke="C"/>
+            <mouse-shortcut
+                    keymap="$default"
+                    keystroke="control button3 doubleClick"/>
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
