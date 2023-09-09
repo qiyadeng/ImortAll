@@ -3,16 +3,18 @@ package tech.qiya.importall;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
+import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.InheritanceUtil;
 import com.siyeh.ig.psiutils.ImportUtils;
 import org.jetbrains.annotations.NotNull;
+import tech.qiya.importall.data.CurrentNeedImportClassesData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
+public class ImportsAreUsedVisitor extends JavaElementVisitor {
 
     private static final Logger LOG = Logger.getInstance(ImportsAreUsedVisitor.class);
     private final PsiJavaFile myFile;
@@ -38,6 +40,8 @@ public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
 
     @Override
     public void visitElement(@NotNull PsiElement element) {
+
+        //LOG.warn("---------visitElement-----------" + element.toString());
         if (importStatements.isEmpty()) {
             return;
         }
@@ -52,18 +56,45 @@ public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
 
     private void followReferenceToImport(PsiJavaCodeReferenceElement reference) {
 
+        LOG.warn("---------followReferenceToImport-----------" + reference.toString());
+        if("PsiJavaCodeReferenceElement:My".equalsIgnoreCase(reference.toString())){
+            LOG.warn("--------at My-----------");
+            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName("My", reference.getResolveScope());
+            for (PsiClass psiClass : classes) {
+                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
+            }
+//            PsiManager psiManager = reference.getManager();
+//            PsiClass inner = psiManager.findClass("tech.qiya.importall.My", reference.getResolveScope());
+//            PsiImportStatement importStatement = psiManager.getElementFactory().createImportStatement(inner);
+        }
+
         if (reference.getQualifier() != null) {
             // it's already fully qualified, so the import statement wasn't
             // responsible
+            LOG.warn("reference.getQualifier() != null" + reference.getQualifier());
             return;
         }
         // during typing there can be incomplete code
         final JavaResolveResult resolveResult = reference.advancedResolve(true);
+        LOG.warn("resolveResult: " + resolveResult.getElement());
+
         PsiElement element = resolveResult.getElement();
         if (element == null) {
-            JavaResolveResult[] results = reference.multiResolve(false);
+            JavaResolveResult[] results = reference.multiResolve(true);
+//            for (JavaResolveResult result : results) {
+//                LOG.warn("result: " + result.getElement());
+//            }
             if (results.length > 0) {
                 element = results[0].getElement();
+            }
+            LOG.warn("$$$$$$$$$$$"+reference.getText());
+            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName(reference.getReferenceName(), reference.getResolveScope());
+            if(CurrentNeedImportClassesData.list== null){
+                CurrentNeedImportClassesData.list = new ArrayList<>();
+            }
+            CurrentNeedImportClassesData.list.add(classes);
+            for (PsiClass psiClass : classes) {
+                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
             }
         }
         if (!(element instanceof PsiMember member)) {
@@ -86,7 +117,7 @@ public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
         if (member instanceof PsiClass referencedClass) {
             qualifiedName = referencedClass.getQualifiedName();
             packageName = qualifiedName != null ? StringUtil.getPackageName(qualifiedName) : null;
-            LOG.warn("qualifiedName: " + qualifiedName);
+            //LOG.warn(" ---qualifiedName: " + qualifiedName );
         }
         else {
             if (!member.hasModifierProperty(PsiModifier.STATIC) || containingClass == null) {
@@ -94,13 +125,14 @@ public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
             }
             packageName = containingClass.getQualifiedName();
             qualifiedName = packageName + '.' + member.getName();
+            //LOG.warn("memmber is not instance of PsiClass =" + qualifiedName);
         }
         if (packageName == null) {
             return null;
         }
         final boolean hasOnDemandImportConflict = ImportUtils.hasOnDemandImportConflict(qualifiedName, myFile);
         for (PsiImportStatementBase importStatement : importStatements) {
-            LOG.warn("importStatement: " + importStatement.getText());
+            //LOG.warn("*******importStatement: " + importStatement.getText());
             if (!importStatement.isOnDemand()) {
                 final PsiJavaCodeReferenceElement reference = importStatement.getImportReference();
                 if (reference == null) {
@@ -108,12 +140,14 @@ public class ImportsAreUsedVisitor extends JavaRecursiveElementWalkingVisitor {
                 }
                 final JavaResolveResult[] targets = reference.multiResolve(false);
                 for (JavaResolveResult target : targets) {
+                    //LOG.warn(member.toString()+"----target: " + target.getElement());
                     if (member.equals(target.getElement())) {
                         return importStatement;
                     }
                 }
             }
             else {
+                //LOG.warn("$$$$$$$$$$$hasOnDemandImportConflict: " + importStatement.getText());
                 if (hasOnDemandImportConflict) {
                     continue;
                 }

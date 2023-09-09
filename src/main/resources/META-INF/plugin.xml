@@ -8,19 +8,21 @@
     <name>ImportAll</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="dsy@qiya.tech" url="https://www.yourcompany.com">qiya.tech</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    Fast Import All Class
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.java-capable</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -33,6 +35,15 @@
         <!-- 在Setting中添加自定义配置模版 -->
 <!--        <projectConfigurable groupId="Other Settings" displayName="My Config" id="thief.id"-->
 <!--                             instance="MySearchableConfigurable"/>-->
+        <localInspection
+        id="inspection.JavaInspection"
+        language="JAVA"
+        shortName="JavaInspection"
+        displayName="JavaInspection"
+        groupName="JavaInspection"
+        enabledByDefault="true"
+        level="ERROR"
+        implementationClass="tech.qiya.importall.ImportControlInspection"/>
     </extensions>
     <actions>
         <action id="tech.qiya.importall.PopupDialogAction" class="tech.qiya.importall.PopupDialogAction"
@@ -46,6 +57,10 @@
                     keymap="$default"
                     keystroke="control button3 doubleClick"/>
             <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+        <action id="ImportAllAction" class="tech.qiya.importall.action.ImportAllAction" text="导入所有的包">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+<!--            <add-to-group group-id="GenerateGroup" anchor="first"/>-->
         </action>
     </actions>
 </idea-plugin>

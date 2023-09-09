@@ -34,6 +34,8 @@ public class PopupDialogAction extends AnAction {
         if (classPath != null) {
             message.append("\nSelected Element: ").append(classPath);
         }
+        //get Edtior
+        //Editor editor = event.getData(CommonDataKeys.EDITOR);
         String title = event.getPresentation().getDescription();
         Messages.showMessageDialog(
                 currentProject,
