@@ -14,6 +14,7 @@ import com.siyeh.ig.psiutils.ImportUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tech.qiya.importall.data.CurrentNeedImportClassesData;
+import tech.qiya.importall.data.HasImportedClassesData;
 
 import java.util.*;
 
@@ -24,8 +25,9 @@ public class ImportControlInspection extends AbstractBaseJavaLocalInspectionTool
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        LOG.warn("---------buildVisitor-----------" + isOnTheFly);
-        CurrentNeedImportClassesData.list = new ArrayList<>();
+        LOG.warn("---------编译的时候开始分析-----------" + isOnTheFly);
+        CurrentNeedImportClassesData.clear();
+        HasImportedClassesData.clear();
         ImportsAreUsedVisitor visitor = new ImportsAreUsedVisitor((PsiJavaFile)holder.getFile());
         return visitor;
     }

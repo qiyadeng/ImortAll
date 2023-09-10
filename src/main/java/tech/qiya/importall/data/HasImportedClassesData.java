@@ -3,15 +3,13 @@ package tech.qiya.importall.data;
 import com.intellij.psi.PsiClass;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class CurrentNeedImportClassesData {
-    //public static List<PsiClass[]> list;
-    public static Map<String,PsiClass[]> map = new HashMap<>();
+public class HasImportedClassesData {
+    public static Map<String, String> map = new HashMap<>();
 
     //add key and value to map
-    public static void add(String key, PsiClass[] value){
+    public static void add(String key, String value){
         //find key in map
         if(!map.containsKey(key)) {
             //if key exist, add value to the key
@@ -23,11 +21,8 @@ public class CurrentNeedImportClassesData {
 
     }
 
-    //cear map
+    //clear map
     public static void clear(){
         map.clear();
     }
-
-    //remove one element from map
-
 }

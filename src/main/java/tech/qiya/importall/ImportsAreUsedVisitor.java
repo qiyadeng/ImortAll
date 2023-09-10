@@ -8,6 +8,7 @@ import com.intellij.psi.util.InheritanceUtil;
 import com.siyeh.ig.psiutils.ImportUtils;
 import org.jetbrains.annotations.NotNull;
 import tech.qiya.importall.data.CurrentNeedImportClassesData;
+import tech.qiya.importall.data.HasImportedClassesData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,18 @@ public class ImportsAreUsedVisitor extends JavaElementVisitor {
 
     @Override
     public void visitImportList(@NotNull PsiImportList list) {
-        //ignore imports
+        PsiImportStatement[] statements = list.getImportStatements();
+        for (PsiImportStatement statement : statements) {
+            LOG.warn("---------visitImportList-----------" + statement.getQualifiedName());
+            //get Class name of import statement
+            String className = statement.getQualifiedName();
+            //remove package name
+            String[] classNameArray = className.split("\\.");
+            String shortClassName = classNameArray[classNameArray.length-1];
+            LOG.warn("---------shortClassName-----------" + shortClassName);
+            HasImportedClassesData.add(shortClassName,statement.getQualifiedName());
+        }
+
     }
 
     @Override
@@ -50,64 +62,86 @@ public class ImportsAreUsedVisitor extends JavaElementVisitor {
 
     @Override
     public void visitReferenceElement(@NotNull PsiJavaCodeReferenceElement reference) {
+
         followReferenceToImport(reference);
         super.visitReferenceElement(reference);
     }
 
     private void followReferenceToImport(PsiJavaCodeReferenceElement reference) {
 
-        LOG.warn("---------followReferenceToImport-----------" + reference.toString());
-        if("PsiJavaCodeReferenceElement:My".equalsIgnoreCase(reference.toString())){
-            LOG.warn("--------at My-----------");
-            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName("My", reference.getResolveScope());
-            for (PsiClass psiClass : classes) {
-                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
-            }
-//            PsiManager psiManager = reference.getManager();
-//            PsiClass inner = psiManager.findClass("tech.qiya.importall.My", reference.getResolveScope());
-//            PsiImportStatement importStatement = psiManager.getElementFactory().createImportStatement(inner);
-        }
+        //LOG.warn("---------followReferenceToImport-----------" + reference.getQualifiedName());
+//        if("PsiJavaCodeReferenceElement:My".equalsIgnoreCase(reference.toString())){
+//            LOG.warn("--------at My-----------");
+//            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName("My", reference.getResolveScope());
+//            for (PsiClass psiClass : classes) {
+//                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
+//            }
+////            PsiManager psiManager = reference.getManager();
+////            PsiClass inner = psiManager.findClass("tech.qiya.importall.My", reference.getResolveScope());
+////            PsiImportStatement importStatement = psiManager.getElementFactory().createImportStatement(inner);
+//        }
+
+        //get reference element
+        PsiElement e1 = reference.getElement();
 
         if (reference.getQualifier() != null) {
             // it's already fully qualified, so the import statement wasn't
             // responsible
-            LOG.warn("reference.getQualifier() != null" + reference.getQualifier());
+            LOG.warn("reference.getQualifier() != null " + reference.getQualifiedName());
             return;
         }
-        // during typing there can be incomplete code
-        final JavaResolveResult resolveResult = reference.advancedResolve(true);
-        LOG.warn("resolveResult: " + resolveResult.getElement());
 
-        PsiElement element = resolveResult.getElement();
-        if (element == null) {
-            JavaResolveResult[] results = reference.multiResolve(true);
-//            for (JavaResolveResult result : results) {
-//                LOG.warn("result: " + result.getElement());
+
+        LOG.warn("$$$$$$$$$$$"+reference.getQualifiedName());
+        PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName(reference.getReferenceName(), reference.getResolveScope());
+        if(classes!=null && classes.length >0) {
+            //if qualifiedName is contains java.lang, don't add to map
+            if (reference.getQualifiedName().contains("java.lang")) {
+            }
+            else {
+                CurrentNeedImportClassesData.add(reference.getQualifiedName(),classes);
+            }
+
+        }
+
+
+
+
+
+//        // during typing there can be incomplete code
+//        final JavaResolveResult resolveResult = reference.advancedResolve(true);
+//        LOG.warn("resolveResult: " + resolveResult.getElement());
+//
+//        PsiElement element = resolveResult.getElement();
+//        if (element == null) {
+//            JavaResolveResult[] results = reference.multiResolve(true);
+////            for (JavaResolveResult result : results) {
+////                LOG.warn("result: " + result.getElement());
+////            }
+//            if (results.length > 0) {
+//                element = results[0].getElement();
 //            }
-            if (results.length > 0) {
-                element = results[0].getElement();
-            }
-            LOG.warn("$$$$$$$$$$$"+reference.getText());
-            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName(reference.getReferenceName(), reference.getResolveScope());
-            if(CurrentNeedImportClassesData.list== null){
-                CurrentNeedImportClassesData.list = new ArrayList<>();
-            }
-            CurrentNeedImportClassesData.list.add(classes);
-            for (PsiClass psiClass : classes) {
-                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
-            }
-        }
-        if (!(element instanceof PsiMember member)) {
-            return;
-        }
-        if (findImport(member, usedImportStatements) != null) {
-            return;
-        }
-        final PsiImportStatementBase foundImport = findImport(member, importStatements);
-        if (foundImport != null) {
-            importStatements.remove(foundImport);
-            usedImportStatements.add(foundImport);
-        }
+//            LOG.warn("$$$$$$$$$$$"+reference.getText());
+//            PsiClass[] classes = PsiShortNamesCache.getInstance(reference.getProject()).getClassesByName(reference.getReferenceName(), reference.getResolveScope());
+//            if(CurrentNeedImportClassesData.list== null){
+//                CurrentNeedImportClassesData.list = new ArrayList<>();
+//            }
+//            CurrentNeedImportClassesData.list.add(classes);
+//            for (PsiClass psiClass : classes) {
+//                LOG.warn("--------psiClass-----------" + psiClass.getQualifiedName());
+//            }
+//        }
+//        if (!(element instanceof PsiMember member)) {
+//            return;
+//        }
+//        if (findImport(member, usedImportStatements) != null) {
+//            return;
+//        }
+//        final PsiImportStatementBase foundImport = findImport(member, importStatements);
+//        if (foundImport != null) {
+//            importStatements.remove(foundImport);
+//            usedImportStatements.add(foundImport);
+//        }
     }
 
     private PsiImportStatementBase findImport(PsiMember member, List<? extends PsiImportStatementBase> importStatements) {
