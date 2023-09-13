@@ -43,7 +43,7 @@ public class ImportAllAction extends AnAction {
         if(map==null || map.size()==0){
             LOG.warn("map is null");
             NotificationGroup notificationGroup = new NotificationGroup("ImportAll", NotificationDisplayType.BALLOON, false);
-            Notification notification = notificationGroup.createNotification("所有包已经导入", MessageType.INFO);
+            Notification notification = notificationGroup.createNotification("All packages have been imported", MessageType.INFO);
             Notifications.Bus.notify(notification);
 
             //加一个IDEA的泡沫框消息提示

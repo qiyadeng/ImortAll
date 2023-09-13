@@ -8,7 +8,7 @@
     <name>ImportAll</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="dsy@qiya.tech" url="https://www.yourcompany.com">qiya.tech</vendor>
+    <vendor email="dsy@qiya.tech" url="#">qiya.tech</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
@@ -46,19 +46,19 @@
         implementationClass="tech.qiya.importall.ImportControlInspection"/>
     </extensions>
     <actions>
-        <action id="tech.qiya.importall.PopupDialogAction" class="tech.qiya.importall.PopupDialogAction"
-                text="Pop Dialog Action" description="SDK action example">
-            <override-text place="MainMenu" text="Popup Dialog Action"/>
-            <keyboard-shortcut
-                    keymap="$default"
-                    first-keystroke="control alt A"
-                    second-keystroke="C"/>
-            <mouse-shortcut
-                    keymap="$default"
-                    keystroke="control button3 doubleClick"/>
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
-        </action>
-        <action id="ImportAllAction" class="tech.qiya.importall.action.ImportAllAction" text="导入所有的包">
+<!--        <action id="tech.qiya.importall.PopupDialogAction" class="tech.qiya.importall.PopupDialogAction"-->
+<!--                text="Pop Dialog Action" description="SDK action example">-->
+<!--            <override-text place="MainMenu" text="Popup Dialog Action"/>-->
+<!--            <keyboard-shortcut-->
+<!--                    keymap="$default"-->
+<!--                    first-keystroke="control alt A"-->
+<!--                    second-keystroke="C"/>-->
+<!--            <mouse-shortcut-->
+<!--                    keymap="$default"-->
+<!--                    keystroke="control button3 doubleClick"/>-->
+<!--            <add-to-group group-id="ToolsMenu" anchor="first"/>-->
+<!--        </action>-->
+        <action id="ImportAllAction" class="tech.qiya.importall.action.ImportAllAction" text="Import All">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 <!--            <add-to-group group-id="GenerateGroup" anchor="first"/>-->
         </action>

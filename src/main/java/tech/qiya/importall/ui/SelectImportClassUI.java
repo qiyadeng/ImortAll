@@ -9,9 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class SelectImportClassUI extends DialogWrapper {
-    private JTextField filterStr;
     private JTable allCandiClassesTable;
-    private JLabel filterLabel;
     private JLabel indexOfToatal;
     private JPanel mainPanel;
 
